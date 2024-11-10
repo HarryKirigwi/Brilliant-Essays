@@ -48,6 +48,10 @@ function AppAppBar() {
     scrollToSection("landing");
   };
 
+  const handleDashboard = () => {
+    navigate("/dashboard");
+  };
+
   const whiteLinks = {
     color: "#EEEEEE",
   };
@@ -135,7 +139,7 @@ function AppAppBar() {
                 </Typography>
               </MenuItem>
               <MenuItem
-                onClick={() => scrollToSection("pricing")}
+                onClick={handleDashboard}
                 sx={{ py: "6px", px: "12px" }}
               >
                 <Typography variant="body2" sx={whiteLinks}>
