@@ -1,19 +1,10 @@
-import {
-  Box,
-  Button,
-  TextField,
-  Typography,
-  Checkbox,
-  FormControlLabel,
-} from "@mui/material";
-import { useForm } from "react-hook-form";
+import { Box, Button, TextField, Typography, Checkbox, FormControlLabel, InputAdornment, IconButton } from "@mui/material";
+import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import "../styles/Forms.css";
 import "../styles/Hero.css";
 import { useNavigate } from "react-router-dom";
-import { InputAdornment, IconButton } from "@mui/material";
-import { Controller } from "react-hook-form";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useState } from "react";
@@ -63,8 +54,32 @@ export function LoginForm() {
     control,
   } = useForm({ resolver: zodResolver(formData) });
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const onSubmit = async (data) => {
+    try {
+      const response = await fetch("http://localhost:3000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem("token", result.token);
+        navigate("/dashboard");
+      } else {
+        alert(result.error);
+      }
+    } catch (error) {
+      console.error("Error during login:", error);
+      alert("An error occurred while logging in.");
+    }
+
     reset();
   };
 
@@ -82,22 +97,11 @@ export function LoginForm() {
             return home
           </Button>
         </Box>
-        <Typography
-          variant="h4"
-          sx={{ fontWeight: "bold" }}
-          gutterBottom
-          align="center"
-        >
+        <Typography variant="h4" sx={{ fontWeight: "bold" }} gutterBottom align="center">
           Welcome back!
         </Typography>
 
-        <Typography
-          variant="body2"
-          sx={{ color: "white" }}
-          align="center"
-          gutterBottom
-          onClick={handleSignup}
-        >
+        <Typography variant="body2" sx={{ color: "white" }} align="center" gutterBottom onClick={handleSignup}>
           Do you have an account yet?{" "}
           <span style={{ cursor: "pointer", color: "blue", marginLeft: 5 }}>
             Create account
@@ -145,11 +149,7 @@ export function LoginForm() {
                         edge="end"
                         sx={{ color: "rgb(255,255,255)" }}
                       >
-                        {showPassword ? (
-                          <VisibilityOffIcon />
-                        ) : (
-                          <VisibilityIcon />
-                        )}
+                        {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                       </IconButton>
                     </InputAdornment>
                   ),
@@ -158,14 +158,9 @@ export function LoginForm() {
             )}
           />
 
+          {/* ```javascript */}
           <div className="forgot-password-div">
-            <FormControlLabel
-              control={<Checkbox sx={{ color: "white" }} />}
-              label="Remember me"
-              size="small"
-              {...register("remember")}
-            />
-
+            <FormControlLabel control={<Checkbox sx={{ color: "white" }} />} label="Remember me" size="small" {...register("remember")} />
             <div>
               <a href="/" className="forgot-password">
                 <Typography variant="body2" sx={{ color: "blue" }}>
@@ -175,12 +170,7 @@ export function LoginForm() {
             </div>
           </div>
 
-          <Button
-            type="submit"
-            variant="contained"
-            fullWidth
-            sx={{ marginTop: 3 }}
-          >
+          <Button type="submit" variant="contained" fullWidth sx={{ marginTop: 3 }}>
             Submit
           </Button>
         </form>
